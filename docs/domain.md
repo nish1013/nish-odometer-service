@@ -102,6 +102,7 @@ As a client, I want a clear error when the photo has no readable odometer, so th
 | --- | --- | --- |
 | a JPEG of a blank wall | read | 422, `error` `UNREADABLE_IMAGE` |
 | digits found, but the service cannot tell which number is the odometer | read | 422, `UNREADABLE_IMAGE`, never a guess (D6) |
+| a JPEG cut off in upload, so it cannot be decoded | read | 422, `UNREADABLE_IMAGE` (D6) |
 
 ### S7. Get an error when no image is sent
 

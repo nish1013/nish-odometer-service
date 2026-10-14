@@ -143,6 +143,7 @@ What a caller can get back:
 - it is not clear which number is the odometer
 - a digit cannot be read
 - the number is not sensible: negative, more than one decimal place, or above 999,999.9
+- the photo is a JPEG or PNG, but it cannot be decoded, for example a cut-off upload
 
 **Why.** A wrong mileage stored upstream does more harm than a failed read. The caller can take a new photo.
 
@@ -233,7 +234,7 @@ What a caller can get back:
 
 **Why.**
 - In our test, the AI model read the blurred photo (img-B) with full certainty. The reading may be wrong.
-- Sharpness is easy to measure. Sharp samples scored 514 and up. img-B scored 8.
+- Sharpness is easy to measure. With our code, sharp samples scored 133 and up. img-B scored 11. The cut-off is 40.
 
 **Alternatives.**
 
@@ -320,7 +321,7 @@ What a caller can get back:
 **Why.**
 - The AI model cannot tell us when it is wrong (D11). Only labelled photos can.
 - The same photo set compares providers fairly (D12).
-- First run found a fault: the AI model took "miles" from the speedometer on img-C, against D9. The prompt needs a fix.
+- First run found a fault: the AI model took "miles" from the speedometer on img-C, against D9. The prompt now says to take the unit only from beside the odometer, and img-C returns `unknown`.
 
 **Alternatives.**
 
