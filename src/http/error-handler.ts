@@ -4,6 +4,7 @@ import { OcrUnavailableError } from "../ocr/ocr-unavailable-error.js";
 import { UnreadableImageError } from "../reading/unreadable-image-error.js";
 import { ApiError } from "./api-error.js";
 import { imageTooLarge } from "./image-input.js";
+import { recordError } from "./request-facts.js";
 
 type ErrorHandler = (
   error: unknown,
@@ -19,6 +20,7 @@ const TOO_LARGE_CODES = new Set([
 export function createErrorHandler(maxImageBytes: number): ErrorHandler {
   return (error, request, reply) => {
     const apiError = toApiError(error, maxImageBytes);
+    recordError(request, apiError.code);
     if (apiError.status === 503)
       request.log.warn({ err: error }, "OCR unavailable");
     else if (apiError.status >= 500)
@@ -36,6 +38,7 @@ export function handleNotFound(
     "NOT_FOUND",
     `No route for ${request.method} ${request.url}`,
   );
+  recordError(request, error.code);
   return reply.status(error.status).send(error.toBody());
 }
 
