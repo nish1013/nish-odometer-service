@@ -1,28 +1,36 @@
 import { ConfigError } from "./config-error.js";
-import type { AppConfig, OcrProviderName } from "./config.types.js";
+import type {
+  AppConfig,
+  OcrProviderName,
+  ProviderConfig,
+} from "./config.types.js";
 
 const MEGABYTE = 1024 * 1024;
 const PROVIDERS: readonly OcrProviderName[] = ["mock", "openai"];
 
 export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
-  const ocrProvider = parseProvider(env.OCR_PROVIDER);
-  const openaiApiKey = env.OPENAI_API_KEY;
-  if (ocrProvider === "openai" && !openaiApiKey) {
-    throw new ConfigError(
-      "OPENAI_API_KEY is required when OCR_PROVIDER=openai",
-    );
-  }
-
   return {
+    ...parseProviderConfig(env),
     port: parsePort(env.PORT),
-    ocrProvider,
-    openaiApiKey,
     maxReading: parsePositive("MAX_READING", env.MAX_READING, 999999.9),
     maxImageBytes: toBytes(parsePositive("MAX_IMAGE_MB", env.MAX_IMAGE_MB, 10)),
     maxBodyBytes: toBytes(parsePositive("MAX_BODY_MB", env.MAX_BODY_MB, 14)),
     ocrTimeoutMs: parsePositive("OCR_TIMEOUT_MS", env.OCR_TIMEOUT_MS, 10000),
     blurCutoff: parsePositive("BLUR_CUTOFF", env.BLUR_CUTOFF, 40),
   };
+}
+
+function parseProviderConfig(env: NodeJS.ProcessEnv): ProviderConfig {
+  const ocrProvider = parseProvider(env.OCR_PROVIDER);
+  if (ocrProvider === "mock") return { ocrProvider };
+
+  const openaiApiKey = env.OPENAI_API_KEY;
+  if (!openaiApiKey) {
+    throw new ConfigError(
+      "OPENAI_API_KEY is required when OCR_PROVIDER=openai",
+    );
+  }
+  return { ocrProvider, openaiApiKey };
 }
 
 function parseProvider(value: string | undefined): OcrProviderName {
