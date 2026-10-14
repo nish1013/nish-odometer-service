@@ -4,7 +4,7 @@ import Fastify, {
   type FastifyServerOptions,
 } from "fastify";
 import type { AppConfig } from "./config/config.types.js";
-import { handleError, handleNotFound } from "./http/error-handler.js";
+import { createErrorHandler, handleNotFound } from "./http/error-handler.js";
 import { registerReadingRoute } from "./http/reading.route.js";
 import type { OcrProvider } from "./ocr/ocr-provider.js";
 
@@ -13,10 +13,12 @@ export async function buildApp(
   provider: OcrProvider,
   options: FastifyServerOptions = {},
 ): Promise<FastifyInstance> {
-  const app = Fastify(options);
-  await app.register(multipart);
-  app.setErrorHandler(handleError);
+  const app = Fastify({ ...options, bodyLimit: config.maxBodyBytes });
+  await app.register(multipart, {
+    limits: { fileSize: config.maxImageBytes },
+  });
+  app.setErrorHandler(createErrorHandler(config.maxImageBytes));
   app.setNotFoundHandler(handleNotFound);
-  registerReadingRoute(app, provider, { maxReading: config.maxReading });
+  registerReadingRoute(app, provider, config);
   return app;
 }
