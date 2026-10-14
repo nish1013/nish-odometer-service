@@ -17,10 +17,16 @@ The service listens on `http://localhost:3000`. On start it logs the provider, e
 
 ## Check it end to end
 
-One command runs every story case against the real service and prints `ok` or `FAIL` per case.
+One command runs every story case against the real service. For each case it prints `ok` or `FAIL`, the request sent and the response received, so both shapes can be read.
 
 ```bash
-scripts/e2e.sh        # add -v to print each response
+scripts/e2e.sh
+```
+
+```
+ok    img-A as Base64 -> same as S1
+      > POST /odometer/reading  application/json  {"image":"/9j/4Q/+RXhpZgAATU0AKgAAAAgACwEPAAIAAAAGAAAAkgEQAA…" (1019184 chars)}
+      < 200 {"reading":62690.5,"unit":"miles","confidence":"high"}
 ```
 
 ```
