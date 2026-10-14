@@ -140,6 +140,12 @@ describe("S7 no image sent", () => {
 });
 
 describe("D19 every error is JSON", () => {
+  it("every response names the provider", async () => {
+    app = await testApp();
+    const res = await app.inject({ method: "GET", url: "/nope" });
+    expect(res.headers["x-ocr-provider"]).toBe("mock/fixtures");
+  });
+
   it("GET /nope -> 404", async () => {
     app = await testApp();
     const res = await app.inject({ method: "GET", url: "/nope" });

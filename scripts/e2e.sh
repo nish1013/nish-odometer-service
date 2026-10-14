@@ -57,15 +57,16 @@ provider_source() {
   else echo "default"; fi
 }
 
+provider="$(curl -s -D - -o /dev/null "$BASE_URL/" | tr -d '\r' | grep -i '^x-ocr-provider:' | cut -d' ' -f2)" || true
+
 echo
 echo "Mode"
 if $STARTED; then
-  provider="$(docker compose logs --no-log-prefix | grep -o 'OCR provider: [^"]*' | head -1)"
   echo "  service    started by this script with docker compose, stopped at the end"
-  echo "  provider   ${provider#OCR provider: }   (OCR_PROVIDER from $(provider_source))"
+  echo "  provider   ${provider:-unknown}   (OCR_PROVIDER from $(provider_source))"
 else
   echo "  service    already running at $BASE_URL, left running"
-  echo "  provider   as that service was started: see its first log line"
+  echo "  provider   ${provider:-unknown}   (as that service was started)"
 fi
 
 short() {
