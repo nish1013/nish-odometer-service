@@ -4,6 +4,7 @@
 # It uses the service's own settings: the shell, then .env, then the defaults (mock).
 # Prints each request and response, so the shapes can be read.
 # Usage: scripts/e2e.sh     BASE_URL defaults to http://localhost:3000
+if [ -z "${BASH_VERSION:-}" ]; then exec bash "$0" "$@"; fi
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -106,7 +107,8 @@ check() {
   local name="$1" status="$2" expected="$3"
   shift 3
   local got body
-  got="$(curl -s -o "$TMP/body" -w '%{http_code}' "$@")"
+  : >"$TMP/body"
+  got="$(curl -s -o "$TMP/body" -w '%{http_code}' "$@")" || got="no response (curl exit $?)"
   body="$(cat "$TMP/body")"
   if [[ "$got" == "$status" && "$body" == *"$expected"* ]]; then
     PASSED=$((PASSED + 1))
