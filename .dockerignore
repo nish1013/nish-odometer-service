@@ -8,3 +8,4 @@ images
 test
 harness
 *.md
+.env

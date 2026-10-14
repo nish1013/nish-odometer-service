@@ -60,6 +60,8 @@ Check the live AI model on the labelled sample photos. It exits non-zero if any 
 OPENAI_API_KEY=sk-... npm run harness
 ```
 
+To keep settings in a file, copy `.env.example` to `.env` and fill it in. `npm run dev`, `npm run harness` and `docker compose up` all read it. A variable set in the shell wins. `.env` is git-ignored and never copied into the image.
+
 Every setting and its default is listed under *Config* in [`docs/technical-notes.md`](docs/technical-notes.md).
 
 ## How a request flows
