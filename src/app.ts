@@ -29,6 +29,9 @@ export async function buildApp(
   app.setErrorHandler(createErrorHandler(config.maxImageBytes));
   app.setNotFoundHandler(handleNotFound);
   app.addHook("onResponse", logRequest(provider));
+  app.addHook("onSend", async (_request, reply) => {
+    reply.header("x-ocr-provider", `${provider.name}/${provider.model}`);
+  });
   registerReadingRoute(
     app,
     {
