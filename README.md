@@ -11,8 +11,32 @@ Mock mode is the default. It needs no account and no network.
 | Docker, no Node needed | `docker compose up` |
 | Node 24 | `npm install`, then `npm run dev` |
 | Tests | `npm test` |
+| End to end, every story | `scripts/e2e.sh` |
 
-The service listens on `http://localhost:3000`. On start it logs the provider, e.g. `OCR provider: mock`.
+The service listens on `http://localhost:3000`. On start it logs the provider, e.g. `OCR provider: mock, model: fixtures`.
+
+## Check it end to end
+
+One command runs every story case against the real service. For each case it prints `ok` or `FAIL`, the request sent and the response received, so both shapes can be read.
+
+```bash
+scripts/e2e.sh
+```
+
+```
+ok    img-A as Base64 -> same as S1
+      > POST /odometer/reading  application/json  {"image":"/9j/4Q/+RXhpZgAATU0AKgAAAAgACwEPAAIAAAAGAAAAkgEQAA…" (1019184 chars)}
+      < 200 {"reading":62690.5,"unit":"miles","confidence":"high"}
+```
+
+```
+nothing on :3000  ->  starts it with docker compose, in mock mode
+                  ->  runs 22 checks, S1-S11, 404, and the log line
+                  ->  stops it again
+already running   ->  uses that service, leaves it running
+```
+
+It needs only bash, curl and Docker. It exits non-zero when a check fails. The 503 cases (S12) need a failing provider, so the HTTP tests in `npm test` cover them.
 
 Try a sample photo:
 
@@ -29,6 +53,14 @@ OCR_PROVIDER=openai OPENAI_API_KEY=sk-... docker compose up
 ```
 
 With `OCR_PROVIDER=openai` and no key, the service does not start. The error names the missing setting.
+
+Check the live AI model on the labelled sample photos. It exits non-zero if any wrong reading comes back as `high`:
+
+```bash
+OPENAI_API_KEY=sk-... npm run harness
+```
+
+Every setting and its default is listed under *Config* in [`docs/technical-notes.md`](docs/technical-notes.md).
 
 ## How a request flows
 

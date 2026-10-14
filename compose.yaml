@@ -1,0 +1,9 @@
+services:
+  odometer:
+    build: .
+    init: true
+    ports:
+      - "3000:3000"
+    environment:
+      OCR_PROVIDER: ${OCR_PROVIDER:-mock}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
