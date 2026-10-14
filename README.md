@@ -1,72 +1,46 @@
-> **About this README.** The sections above the line cover how to run the service and where the design is documented.
-> Below the line is the original brief, unchanged. The brief was treated as a draft specification.
-> Where it left a point open, a decision was made and recorded with its rationale in [`docs/decisions.md`](docs/decisions.md).
+> A photo goes in. The mileage, its unit and a `low` / `high` confidence come out. When the service is not sure, it returns an error, never a guess.
+>
+> Below the line is the original brief, unchanged. Where it left a point open, the decision is in [`docs/decisions.md`](docs/decisions.md).
 
-## How to run
+## Run
 
-Mock mode is the default. It needs no account and no network.
+Mock mode is the default. No account, no network.
 
-| Way | Command |
+| | Command |
 | --- | --- |
-| Docker, no Node needed | `docker compose up` |
+| Docker | `docker compose up` |
 | Node 24 | `npm install`, then `npm run dev` |
 | Tests | `npm test` |
-| End to end, every story | `scripts/e2e.sh` |
+| Every story, end to end | `scripts/e2e.sh` |
+| Live OpenAI | `OCR_PROVIDER=openai OPENAI_API_KEY=sk-... npm run dev` |
+| Live AI model on labelled photos | `OPENAI_API_KEY=sk-... npm run harness` |
 
-The service listens on `http://localhost:3000`. On start it logs the provider, e.g. `OCR provider: mock, model: fixtures`.
-
-## Check it end to end
-
-One command runs every story case against the real service. For each case it prints `ok` or `FAIL`, the request sent and the response received, so both shapes can be read.
-
-```bash
-scripts/e2e.sh
-```
-
-```
-ok    img-A as Base64 -> same as S1
-      > POST /odometer/reading  application/json  {"image":"/9j/4Q/+RXhpZgAATU0AKgAAAAgACwEPAAIAAAAGAAAAkgEQAA…" (1019184 chars)}
-      < 200 {"reading":62690.5,"unit":"miles","confidence":"high"}
-```
-
-```
-nothing on :3000  ->  starts it with docker compose, with your settings (shell, .env, else mock)
-                  ->  runs 22 checks, S1-S11, 404, and the log line
-                  ->  stops it again
-already running   ->  uses that service, leaves it running
-```
-
-It first prints the mode: who started the service, and which provider runs. With `OCR_PROVIDER=openai` the same checks run against the live AI model. It needs only bash, curl and Docker. It exits non-zero when a check fails. The 503 cases (S12) need a failing provider, so the HTTP tests in `npm test` cover them.
-
-Try a sample photo:
+Settings can also live in `.env`. Copy `.env.example`.
 
 ```bash
 curl -X POST http://localhost:3000/odometer/reading \
   -F "image=@images/33c24909-e9dd-46d3-8e7f-c44fd9896537.jpeg"
+# {"reading":62690.5,"unit":"miles","confidence":"high"}
 ```
 
-Live OCR with OpenAI:
+## Design
 
-```bash
-OCR_PROVIDER=openai OPENAI_API_KEY=sk-... npm run dev
-OCR_PROVIDER=openai OPENAI_API_KEY=sk-... docker compose up
-```
+Decisions, trade-offs and risks live in `docs/`:
 
-With `OCR_PROVIDER=openai` and no key, the service does not start. The error names the missing setting.
+- [`domain.md`](docs/domain.md): user stories and constraints
+- [`decisions.md`](docs/decisions.md): each decision, the options rejected, the trade-off accepted
+- [`plan.md`](docs/plan.md): stack, tests, the PRs and what changed on the way
+- [`technical-notes.md`](docs/technical-notes.md): exact values, settings and test evidence
 
-Check the live AI model on the labelled sample photos. It exits non-zero if any wrong reading comes back as `high`:
+Open risks:
 
-```bash
-OPENAI_API_KEY=sk-... npm run harness
-```
-
-To keep settings in a file, copy `.env.example` to `.env` and fill it in. `npm run dev`, `npm run harness` and `docker compose up` all read it. A variable set in the shell wins. `.env` is git-ignored and never copied into the image.
-
-Every setting and its default is listed under *Config* in [`docs/technical-notes.md`](docs/technical-notes.md).
+- A wrong number could still come back as `high`. More labelled photos will test this.
+- A photo with only the odometer blurred can pass as `high`.
+- OpenAI is not yet compared with a second provider.
 
 ## How a request flows
 
-Each check runs in this order. The first one that fails decides the response.
+The first check that fails decides the response.
 
 ```mermaid
 flowchart TD
@@ -85,6 +59,7 @@ flowchart TD
   size -- "yes" --> type{"JPEG or PNG,<br/>by first bytes?"}
   type -- "no" --> e415["415 UNSUPPORTED_TYPE"]
   type -- "yes" --> blur["Measure blur"]
+  blur -- "no detail, or will not decode" --> e422a["422 UNREADABLE_IMAGE"]
   blur --> ocr["Ask OCR provider<br/>(OpenAI or mock)"]
   ocr -- "down, over 10 s, or refuses" --> e503["503 OCR_UNAVAILABLE"]
   ocr -- "answer" --> sure{"Odometer found, one clear number,<br/>every digit read, sensible?"}
@@ -96,33 +71,9 @@ flowchart TD
 
   classDef err fill:#fde2e2,stroke:#c0392b,color:#000
   classDef ok fill:#e2f5e6,stroke:#27ae60,color:#000
-  class e400a,e400b,e400c,e400d,e413,e415,e503,e422 err
+  class e400a,e400b,e400c,e400d,e413,e415,e503,e422a,e422 err
   class low,high ok
 ```
-
-## Design
-
-Read in this order:
-
-| # | File | Answers |
-| --- | --- | --- |
-| 1 | [`docs/domain.md`](docs/domain.md) | What must it do? User stories S1-S12 and constraints C1-C5 |
-| 2 | [`docs/decisions.md`](docs/decisions.md) | What was chosen, and why? D1-D20, each with alternatives and the trade-off accepted |
-| 3 | [`docs/plan.md`](docs/plan.md) | How is it built? Stack, tests, 4 PRs |
-| 4 | [`docs/technical-notes.md`](docs/technical-notes.md) | Which exact values? Rules, limits, config, test evidence |
-
-Where the build adds to the brief:
-
-| The brief says | The build does | Decision |
-| --- | --- | --- |
-| `reading` `48253`, a whole number | May have one decimal: `62690.5` | D8 |
-| `unit` `miles` | `miles`, `km` or `unknown` | D9 |
-| `confidence` `high` | `low` or `high` | D10 |
-| 4 error codes | Also 413 `IMAGE_TOO_LARGE`, 503 `OCR_UNAVAILABLE`, 404 `NOT_FOUND`, 500 `INTERNAL_ERROR` | D5, D13, D19 |
-| Node.js 20+ | Node 24 | D3 |
-| `PORT`, `OCR_PROVIDER` | Also `OPENAI_API_KEY`, timeout, size limits, blur cut-off | D5, D11, D12, D13 |
-| A real OCR provider | OpenAI vision, for now | D12 |
-| npm only | Also Docker Compose | D20 |
 
 ---
 
