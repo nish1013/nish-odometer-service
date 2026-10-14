@@ -6,7 +6,6 @@ describe("loadConfig", () => {
     expect(loadConfig({})).toEqual({
       port: 3000,
       ocrProvider: "mock",
-      openaiApiKey: undefined,
       maxReading: 999999.9,
       maxImageBytes: 10 * 1024 * 1024,
       maxBodyBytes: 14 * 1024 * 1024,
@@ -28,7 +27,10 @@ describe("loadConfig", () => {
 
   it("S10 openai with key -> openai", () => {
     const env = { OCR_PROVIDER: "openai", OPENAI_API_KEY: "sk-test" };
-    expect(loadConfig(env).ocrProvider).toBe("openai");
+    expect(loadConfig(env)).toMatchObject({
+      ocrProvider: "openai",
+      openaiApiKey: "sk-test",
+    });
   });
 
   it.each(["foo", "", "Mock", " mock"])(

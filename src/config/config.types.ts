@@ -1,7 +1,5 @@
-export interface AppConfig {
+export interface ServiceConfig {
   port: number;
-  ocrProvider: OcrProviderName;
-  openaiApiKey: string | undefined;
   maxReading: number;
   maxImageBytes: number;
   maxBodyBytes: number;
@@ -9,4 +7,15 @@ export interface AppConfig {
   blurCutoff: number;
 }
 
-export type OcrProviderName = "mock" | "openai";
+export interface MockProviderConfig {
+  ocrProvider: "mock";
+}
+
+export interface OpenAiProviderConfig {
+  ocrProvider: "openai";
+  openaiApiKey: string;
+}
+
+export type ProviderConfig = MockProviderConfig | OpenAiProviderConfig;
+export type AppConfig = ServiceConfig & ProviderConfig;
+export type OcrProviderName = ProviderConfig["ocrProvider"];
