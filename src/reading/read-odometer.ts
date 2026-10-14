@@ -1,3 +1,5 @@
+import { detectImageType } from "../image/image-type.js";
+import { UnsupportedTypeError } from "../image/unsupported-type-error.js";
 import type { OcrProvider } from "../ocr/ocr-provider.js";
 import { decide } from "./reading-rules.js";
 import type { Reading, ReadingLimits } from "./reading.types.js";
@@ -8,6 +10,8 @@ export async function readOdometer(
   provider: OcrProvider,
   limits: ReadingLimits,
 ): Promise<Reading> {
+  if (detectImageType(image) === null) throw new UnsupportedTypeError();
+
   const answer = await provider.read(image);
   const reading = decide(answer, limits);
   if (reading === null) throw new UnreadableImageError();
