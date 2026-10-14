@@ -2,7 +2,7 @@
 
 Status: locked, 2026-10-14.
 
-A TypeScript HTTP service that reads the mileage from an odometer photo. It runs on Node 24 or in Docker. It is delivered as 4 PRs, each one tested and runnable end to end.
+A TypeScript HTTP service that reads the mileage from an odometer photo. It runs on Node 24 or in Docker. It was planned as 4 PRs, each one tested and runnable end to end. Two small PRs followed, listed under *Deviations*.
 
 Stories and constraints: `domain.md`. Decisions: `decisions.md`. Exact values: `technical-notes.md`. Request flow: the diagram in `README.md`.
 
@@ -99,7 +99,7 @@ src/
   app.ts                       buildApp(config, provider): routes, limits, error handler
   config/
     config.ts                  read env, fail on a bad value (D17)
-    config.types.ts            AppConfig
+    config.types.ts            AppConfig. The OpenAI key exists only on the openai variant
   http/
     reading.route.ts           POST /odometer/reading: wiring only
     image-input.ts             multipart or JSON body -> image bytes
@@ -111,10 +111,10 @@ src/
   reading/
     reading.types.ts           OcrAnswer, Reading, Unit, Confidence
     reading-rules.ts           decide(answer, blur, limits) -> reading or unreadable. Pure, no I/O
-    read-odometer.ts           type -> blur -> provider -> rules
+    read-odometer.ts           type -> blur -> provider, 10 s timeout -> rules (D13)
   ocr/
     ocr-provider.ts            interface OcrProvider { read(image): Promise<OcrAnswer> }
-    openai-provider.ts         OpenAI call, schema, timeout (D12, D13)
+    openai-provider.ts         OpenAI call and answer schema (D12)
     mock-provider.ts           SHA-256 -> fixed answer (D14)
     mock-fixtures.ts           the 4 sample answers
     ocr-unavailable-error.ts
@@ -242,4 +242,5 @@ See *Future considerations* in `domain.md`.
 | 2026-10-14 | 3 | A JPEG or PNG that cannot be decoded returns 422 `UNREADABLE_IMAGE`. Added to D6, S6 and the domain contract. | No decision covered it. The blur check decodes every photo from PR 3 on. The caller should retake the photo (C4). |
 | 2026-10-14 | 4 | Added `scripts/e2e.sh`: every story case over HTTP against the running service, started with Docker Compose when nothing is up. CI runs it as the Docker check. | Asked for by the owner, so anyone can check the whole service with one command and no Node install. |
 | 2026-10-14 | 4 | When OpenAI rejects a call, the log keeps only its status, code and type, never its message. | OpenAI's message for a wrong key holds part of the key. No part of a key may reach the log. |
-| 2026-10-14 | after 4 | A photo with no detail (blur score under 1) returns 422 before the AI model is asked. Added to D11 and the domain contract. | With OpenAI, a blank image came back as reading `000000`. A prompt fix did not change it. S6 expects 422. |
+| 2026-10-14 | 5 | Settings can come from `.env`, for `npm run dev`, the harness and Compose. `scripts/e2e.sh` prints and honours the provider the service runs with. Each response names the provider in an `x-ocr-provider` header. | Without it, e2e could pass in mock mode while the owner meant to test OpenAI. |
+| 2026-10-14 | 6 | A photo with no detail (blur score under 1) returns 422 before the AI model is asked. Added to D11 and the domain contract. | With OpenAI, a blank image came back as reading `000000`. A prompt fix did not change it. S6 expects 422. |
