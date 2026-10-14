@@ -6,7 +6,7 @@ try {
   const config = loadConfig(process.env);
   const provider = createProvider(config);
   const app = await buildApp(config, provider, { logger: true });
-  app.log.info(`OCR provider: ${provider.name}`);
+  app.log.info(`OCR provider: ${provider.name}, model: ${provider.model}`);
   await app.listen({ port: config.port, host: "0.0.0.0" });
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

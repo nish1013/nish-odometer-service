@@ -42,9 +42,22 @@ max reading    999,999.9, config
 
 ## Blur check (D11)
 
-- Score: variance of the Laplacian on a greyscale copy. Cut-off near 100, in config.
+- Score: variance of the Laplacian on a greyscale copy, resized to 800 px wide. Cut-off 40, in config.
 - Decoded with `sharp`, which runs off the event loop. A pure-JS decoder would block other requests for 100+ ms on a 5 MB photo (D2).
 - Resize to a fixed width before scoring, so the score does not depend on photo size.
+- A JPEG or PNG that cannot be decoded returns 422 `UNREADABLE_IMAGE`. The OCR provider is not called (D6).
+
+Scores measured with `blur.ts`, 2026-10-14:
+
+| Photo | 400 px | 600 px | **800 px** | 1000 px |
+| --- | --- | --- | --- | --- |
+| img-A | 1096 | 1149 | **913** | 611 |
+| img-B (blurred) | 10 | 12 | **11** | 9 |
+| img-C | 850 | 614 | **394** | 251 |
+| img-D | 418 | 214 | **133** | 88 |
+
+- 800 px keeps a margin of about 3x on each side of the cut-off: img-B 11, lowest sharp photo 133.
+- A smaller width separates these 4 photos more, but shrinking a photo hides mild blur. Missing blur is the unsafe direction (C3).
 
 ## OCR call (D12, D13)
 
@@ -76,7 +89,7 @@ OPENAI_API_KEY    needed for openai      missing: no start (D17)
 OCR_TIMEOUT_MS    10000
 MAX_IMAGE_MB      10
 MAX_BODY_MB       14
-BLUR_CUTOFF       100
+BLUR_CUTOFF       40
 MAX_READING       999999.9
 ```
 

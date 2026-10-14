@@ -1,0 +1,30 @@
+[
+  {
+    "name": "img-A",
+    "file": "images/33c24909-e9dd-46d3-8e7f-c44fd9896537.jpeg",
+    "reading": 62690.5,
+    "unit": "miles",
+    "confidence": "high"
+  },
+  {
+    "name": "img-B",
+    "file": "images/d621e37e-7c0f-49a4-8a19-d628b1e82a33.jpeg",
+    "reading": null,
+    "unit": "miles",
+    "confidence": "low"
+  },
+  {
+    "name": "img-C",
+    "file": "images/dbab9932-823e-49ed-80db-1e898d836d5e.jpeg",
+    "reading": 205265,
+    "unit": "unknown",
+    "confidence": "high"
+  },
+  {
+    "name": "img-D",
+    "file": "images/3ae9d173-8895-409e-844c-77b5841138d7.jpeg",
+    "reading": 161967,
+    "unit": "unknown",
+    "confidence": "high"
+  }
+]

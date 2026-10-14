@@ -10,6 +10,8 @@ describe("loadConfig", () => {
       maxReading: 999999.9,
       maxImageBytes: 10 * 1024 * 1024,
       maxBodyBytes: 14 * 1024 * 1024,
+      ocrTimeoutMs: 10000,
+      blurCutoff: 40,
     });
   });
 
@@ -50,9 +52,12 @@ describe("loadConfig", () => {
     },
   );
 
-  it.each(["MAX_IMAGE_MB", "MAX_BODY_MB"])('%s "0" -> names it', (name) => {
-    expect(() => loadConfig({ [name]: "0" })).toThrow(name);
-  });
+  it.each(["MAX_IMAGE_MB", "MAX_BODY_MB", "OCR_TIMEOUT_MS", "BLUR_CUTOFF"])(
+    '%s "0" -> names it',
+    (name) => {
+      expect(() => loadConfig({ [name]: "0" })).toThrow(name);
+    },
+  );
 
   it("S11 MAX_IMAGE_MB=5 -> 5 MB in bytes", () => {
     expect(loadConfig({ MAX_IMAGE_MB: "5" }).maxImageBytes).toBe(

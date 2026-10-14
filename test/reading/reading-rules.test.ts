@@ -3,10 +3,11 @@ import { decide } from "../../src/reading/reading-rules.js";
 import type { OcrAnswer } from "../../src/reading/reading.types.js";
 import { sureAnswer } from "../support/answers.js";
 
-const LIMITS = { maxReading: 999999.9 };
+const LIMITS = { maxReading: 999999.9, blurCutoff: 40 };
+const SHARP = 900;
 
 const read = (overrides: Partial<OcrAnswer>) =>
-  decide(sureAnswer(overrides), LIMITS);
+  decide(sureAnswer(overrides), SHARP, LIMITS);
 
 describe("digits", () => {
   it.each([
@@ -69,6 +70,14 @@ describe("confidence", () => {
   it("C3 another possible reading -> low", () => {
     const answer = { digits: "15451.0", otherPossibleReadings: ["154510"] };
     expect(read(answer)?.confidence).toBe("low");
+  });
+
+  it("C3 blur score below the cut-off, sure AI model -> low", () => {
+    expect(decide(sureAnswer(), 39.9, LIMITS)?.confidence).toBe("low");
+  });
+
+  it("D11 blur score equal to the cut-off -> not blurred", () => {
+    expect(decide(sureAnswer(), 40, LIMITS)?.confidence).toBe("high");
   });
 
   it("C3 unreadable other reading -> low", () => {

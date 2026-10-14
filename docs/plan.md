@@ -69,6 +69,7 @@ The rule steps are in `technical-notes.md`. Boundary cases the tests assert:
 | digits `012345` | 200, `12345` | leading zeros are display padding |
 | digits `62?90` | 422 | a digit cannot be read (D6) |
 | digits `1545 10` | 422 | only digits and one `.` are a reading |
+| JPEG bytes that do not decode | 422 | the photo cannot be read (D6) |
 | other readings `["62690.5"]`, same as digits | ignored | the same reading is not doubt |
 | other readings `["154510"]` | `low` | a second reading is possible (D10) |
 | blur score below the cut-off | `low` | even when the AI model is sure (D11) |
@@ -141,7 +142,7 @@ adapters    ocr/*, blur                                  the outside world
 - Guard: the blur check marks img-B `low` before the AI model is asked. The harness blocks a release with even one wrong `high` (D15).
 - Proof the guard works: remove the blur check, and the test "blurred photo, sure AI model → `low`" fails.
 
-The blur score depends on image size. `blur.ts` resizes to a fixed width before scoring. The cut-off is measured again with this code in PR 3. The earlier scores (8 vs 514+) came from a test script, so they are not the final values.
+The blur score depends on image size. `blur.ts` resizes to 800 px wide before scoring. Measured with this code: img-B 11, sharp samples 133 and up. The cut-off is 40. The scores are in `technical-notes.md`.
 
 ## Tests
 
@@ -237,3 +238,4 @@ See *Future considerations* in `domain.md`.
 | Date | PR | Change | Why |
 | --- | --- | --- | --- |
 | 2026-10-14 | 1 → 3 | The 2 blur rows of the domain contract table move from PR 1 to PR 3. In PR 1 the reading rules take no blur input. | Blur is measured from PR 3 on. A blur input in PR 1 would carry a value nobody measured. |
+| 2026-10-14 | 3 | A JPEG or PNG that cannot be decoded returns 422 `UNREADABLE_IMAGE`. Added to D6, S6 and the domain contract. | No decision covered it. The blur check decodes every photo from PR 3 on. The caller should retake the photo (C4). |
