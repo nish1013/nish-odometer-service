@@ -6,7 +6,7 @@ import { sureAnswer } from "../support/answers.js";
 import { FakeProvider } from "../support/fake-provider.js";
 import { BROKEN_JPEG } from "../support/files.js";
 import { postFile, testApp } from "../support/http.js";
-import { IMG_A, IMG_B } from "../support/samples.js";
+import { BLANK_WALL, IMG_A, IMG_B } from "../support/samples.js";
 
 let app: FastifyInstance;
 let provider: FakeProvider;
@@ -39,6 +39,14 @@ describe("S5 blurred photo", () => {
     expect((await postFile(app, "image", IMG_A)).json()).toMatchObject({
       confidence: "high",
     });
+  });
+
+  it("S6 blank photo, AI model sure of a reading -> 422, provider not called", async () => {
+    await appWith(sure);
+    const res = await postFile(app, "image", BLANK_WALL);
+    expect(res.statusCode).toBe(422);
+    expect(res.json()).toMatchObject({ error: "UNREADABLE_IMAGE" });
+    expect(provider.calls).toBe(0);
   });
 
   it("C4 JPEG bytes that do not decode -> 422, provider not called", async () => {

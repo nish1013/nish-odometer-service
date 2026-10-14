@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decide } from "../../src/reading/reading-rules.js";
+import { decide, hasNothingToRead } from "../../src/reading/reading-rules.js";
 import type { OcrAnswer } from "../../src/reading/reading.types.js";
 import { sureAnswer } from "../support/answers.js";
 
@@ -84,5 +84,15 @@ describe("confidence", () => {
     expect(read({ otherPossibleReadings: ["626?0.5"] })?.confidence).toBe(
       "low",
     );
+  });
+});
+
+describe("nothing to read", () => {
+  it("S6 blur score 0.99 -> nothing to read", () => {
+    expect(hasNothingToRead(0.99)).toBe(true);
+  });
+
+  it("blur score 1 -> readable", () => {
+    expect(hasNothingToRead(1)).toBe(false);
   });
 });

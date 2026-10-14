@@ -2,8 +2,11 @@ import { readFileSync } from "node:fs";
 
 const padded = (head: Buffer): Buffer =>
   Buffer.concat([head, Buffer.alloc(64)]);
-const BLANK_WALL = readFileSync(
-  new URL("../fixtures/blank-wall.jpeg", import.meta.url),
+const IMG_A = readFileSync(
+  new URL(
+    "../../images/33c24909-e9dd-46d3-8e7f-c44fd9896537.jpeg",
+    import.meta.url,
+  ),
 );
 
 export const GIF = padded(Buffer.from("GIF89a"));
@@ -14,5 +17,5 @@ export const HEIC = padded(
 export const BROKEN_JPEG = padded(Buffer.from([0xff, 0xd8, 0xff]));
 
 export function jpegOfSize(bytes: number): Buffer {
-  return Buffer.concat([BLANK_WALL, Buffer.alloc(bytes - BLANK_WALL.length)]);
+  return Buffer.concat([IMG_A, Buffer.alloc(bytes - IMG_A.length)]);
 }

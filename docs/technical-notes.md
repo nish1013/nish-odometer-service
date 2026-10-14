@@ -21,6 +21,7 @@ Rules our code applies, the same for every provider:
 | --- | --- | --- |
 | Before OCR | Not JPEG / PNG, by first bytes | 415 (D4) |
 | Before OCR | Over the size limit | 413 (D5) |
+| Before OCR | Blur score under 1: no detail, nothing to read | 422 (D6, D11) |
 | Before OCR | Blur score under the cut-off | `low` at most (D11) |
 | After OCR | No odometer, or trip meter only | 422 (D6, D7) |
 | After OCR | Not clear which number is the odometer | 422 (D6) |

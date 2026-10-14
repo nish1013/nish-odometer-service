@@ -9,3 +9,4 @@ export const IMG_C = load("images/dbab9932-823e-49ed-80db-1e898d836d5e.jpeg");
 export const IMG_D = load("images/3ae9d173-8895-409e-844c-77b5841138d7.jpeg");
 export const BLANK_WALL = load("test/fixtures/blank-wall.jpeg");
 export const BLANK_WALL_PNG = load("test/fixtures/blank-wall.png");
+export const STRIPES_PNG = load("test/fixtures/stripes.png");

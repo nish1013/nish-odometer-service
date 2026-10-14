@@ -70,6 +70,7 @@ The rule steps are in `technical-notes.md`. Boundary cases the tests assert:
 | digits `62?90` | 422 | a digit cannot be read (D6) |
 | digits `1545 10` | 422 | only digits and one `.` are a reading |
 | JPEG bytes that do not decode | 422 | the photo cannot be read (D6) |
+| blur score under 1, a blank image | 422 | nothing to read. The AI model reads `000000` into it (D11) |
 | other readings `["62690.5"]`, same as digits | ignored | the same reading is not doubt |
 | other readings `["154510"]` | `low` | a second reading is possible (D10) |
 | blur score below the cut-off | `low` | even when the AI model is sure (D11) |
@@ -241,3 +242,4 @@ See *Future considerations* in `domain.md`.
 | 2026-10-14 | 3 | A JPEG or PNG that cannot be decoded returns 422 `UNREADABLE_IMAGE`. Added to D6, S6 and the domain contract. | No decision covered it. The blur check decodes every photo from PR 3 on. The caller should retake the photo (C4). |
 | 2026-10-14 | 4 | Added `scripts/e2e.sh`: every story case over HTTP against the running service, started with Docker Compose when nothing is up. CI runs it as the Docker check. | Asked for by the owner, so anyone can check the whole service with one command and no Node install. |
 | 2026-10-14 | 4 | When OpenAI rejects a call, the log keeps only its status, code and type, never its message. | OpenAI's message for a wrong key holds part of the key. No part of a key may reach the log. |
+| 2026-10-14 | after 4 | A photo with no detail (blur score under 1) returns 422 before the AI model is asked. Added to D11 and the domain contract. | With OpenAI, a blank image came back as reading `000000`. A prompt fix did not change it. S6 expects 422. |

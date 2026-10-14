@@ -3,7 +3,7 @@ import type { ImageType } from "../image/image.types.js";
 import { detectImageType } from "../image/image-type.js";
 import { UnsupportedTypeError } from "../image/unsupported-type-error.js";
 import { OcrUnavailableError } from "../ocr/ocr-unavailable-error.js";
-import { decide } from "./reading-rules.js";
+import { decide, hasNothingToRead } from "./reading-rules.js";
 import type {
   OcrAnswer,
   Reading,
@@ -26,6 +26,7 @@ export async function readOdometer(
     throw new UnreadableImageError({ cause: error });
   });
   facts.blurScore = blurScore;
+  if (hasNothingToRead(blurScore)) throw new UnreadableImageError();
 
   const started = performance.now();
   let answer: OcrAnswer;
