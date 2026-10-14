@@ -14,7 +14,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "harness": "tsx harness/run.ts"
   },
   "dependencies": {
     "@fastify/multipart": "^10.1.3",
