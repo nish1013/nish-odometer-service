@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Runs every story case against the running service, in mock mode.
+# Runs every story case against the running service.
 # Starts it with docker compose when nothing answers on BASE_URL, and stops it again at the end.
+# It uses the service's own settings: the shell, then .env, then the defaults (mock).
 # Prints each request and response, so the shapes can be read.
 # Usage: scripts/e2e.sh     BASE_URL defaults to http://localhost:3000
 set -euo pipefail
@@ -33,12 +34,37 @@ is_up() { curl -s -o /dev/null --max-time 2 "$BASE_URL/"; }
 if ! is_up; then
   echo "No service at $BASE_URL. Starting it with docker compose..."
   STARTED=true
-  if ! OCR_PROVIDER=mock docker compose up -d --build >"$TMP/compose.log" 2>&1; then
+  if ! docker compose up -d --build >"$TMP/compose.log" 2>&1; then
     cat "$TMP/compose.log"
     exit 1
   fi
-  for _ in $(seq 1 60); do is_up && break; sleep 1; done
-  is_up || { echo "Service did not start"; docker compose logs; exit 1; }
+  for _ in $(seq 1 60); do
+    is_up && break
+    [[ -z "$(docker compose ps -q --status running)" ]] && break
+    sleep 1
+  done
+  if ! is_up; then
+    echo "Service did not start:"
+    docker compose logs --no-log-prefix | tail -5
+    exit 1
+  fi
+fi
+
+provider_source() {
+  if [[ -n "${OCR_PROVIDER:-}" ]]; then echo "shell"
+  elif [[ -f .env ]] && grep -q '^OCR_PROVIDER=.' .env; then echo ".env"
+  else echo "default"; fi
+}
+
+echo
+echo "Mode"
+if $STARTED; then
+  provider="$(docker compose logs --no-log-prefix | grep -o 'OCR provider: [^"]*' | head -1)"
+  echo "  service    started by this script with docker compose, stopped at the end"
+  echo "  provider   ${provider#OCR provider: }   (OCR_PROVIDER from $(provider_source))"
+else
+  echo "  service    already running at $BASE_URL, left running"
+  echo "  provider   as that service was started: see its first log line"
 fi
 
 short() {

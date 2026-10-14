@@ -30,13 +30,13 @@ ok    img-A as Base64 -> same as S1
 ```
 
 ```
-nothing on :3000  ->  starts it with docker compose, in mock mode
+nothing on :3000  ->  starts it with docker compose, with your settings (shell, .env, else mock)
                   ->  runs 22 checks, S1-S11, 404, and the log line
                   ->  stops it again
 already running   ->  uses that service, leaves it running
 ```
 
-It needs only bash, curl and Docker. It exits non-zero when a check fails. The 503 cases (S12) need a failing provider, so the HTTP tests in `npm test` cover them.
+It first prints the mode: who started the service, and which provider runs. With `OCR_PROVIDER=openai` the same checks run against the live AI model. It needs only bash, curl and Docker. It exits non-zero when a check fails. The 503 cases (S12) need a failing provider, so the HTTP tests in `npm test` cover them.
 
 Try a sample photo:
 
