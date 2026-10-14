@@ -4,7 +4,7 @@ import { sureAnswer } from "../support/answers.js";
 import { FakeProvider } from "../support/fake-provider.js";
 import { GIF, HEIC, PDF, jpegOfSize } from "../support/files.js";
 import { postFile, postJson, postRaw, testApp } from "../support/http.js";
-import { BLANK_WALL_PNG, IMG_A } from "../support/samples.js";
+import { IMG_A, STRIPES_PNG } from "../support/samples.js";
 
 const MB = 1024 * 1024;
 const IMG_A_BODY = { reading: 62690.5, unit: "miles", confidence: "high" };
@@ -77,7 +77,7 @@ describe("S8 file type", () => {
 
   it("PNG sent as image/jpeg -> 200", async () => {
     await spyApp();
-    const res = await postFile(app, "image", BLANK_WALL_PNG);
+    const res = await postFile(app, "image", STRIPES_PNG);
     expect(res.statusCode).toBe(200);
     expect(provider.calls).toBe(1);
   });

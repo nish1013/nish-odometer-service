@@ -5,8 +5,8 @@ import { MockProvider } from "../../src/ocr/mock-provider.js";
 import type { OcrProvider } from "../../src/ocr/ocr-provider.js";
 import { OpenAiProvider } from "../../src/ocr/openai-provider.js";
 import { postFile, testApp } from "../support/http.js";
-import { GIF, jpegOfSize } from "../support/files.js";
-import { IMG_A } from "../support/samples.js";
+import { GIF } from "../support/files.js";
+import { BLANK_WALL, IMG_A } from "../support/samples.js";
 
 let app: FastifyInstance;
 let output: string;
@@ -65,7 +65,7 @@ describe("D16 log line", () => {
 
   it("422 -> error code and the facts gathered", async () => {
     await loggedApp();
-    await postFile(app, "image", jpegOfSize(2000));
+    await postFile(app, "image", BLANK_WALL);
     expect(requestLines()[0]).toMatchObject({
       status: 422,
       errorCode: "UNREADABLE_IMAGE",

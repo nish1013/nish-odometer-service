@@ -246,6 +246,8 @@ What a caller can get back:
 | Read twice and compare | Catches an unsure AI model | Same answer 4 times on img-B |
 | Two providers vote | A real second opinion | Double the cost and setup |
 
+A photo with no detail at all (blur score under 1) returns 422 before the AI model is asked. On a blank image the AI model read `"000000"` every time, even when the prompt told it not to.
+
 **Trade-off we accept.** A sharp photo with only the odometer blurred may still pass as `high`. The cut-off is measured in the build, then tuned with more labelled photos (D15).
 
 ---

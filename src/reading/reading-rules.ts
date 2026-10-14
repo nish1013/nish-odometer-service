@@ -8,6 +8,12 @@ import type {
 } from "./reading.types.js";
 
 const READING_FORMAT = /^\d+(\.\d)?$/;
+const NOTHING_TO_READ_BELOW = 1;
+
+// The AI model reads digits into a blank image, so a photo with no detail is refused before it is asked.
+export function hasNothingToRead(blurScore: number): boolean {
+  return blurScore < NOTHING_TO_READ_BELOW;
+}
 
 export function decide(
   answer: OcrAnswer,
