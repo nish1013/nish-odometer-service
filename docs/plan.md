@@ -178,7 +178,7 @@ The top part already exists. PR 4 makes every command in it true, and adds `npm 
    - img-B returns `low`. A photo that is not a sample returns 422.
    - `OCR_PROVIDER=foo npm run dev` exits non-zero and names `OCR_PROVIDER`.
    - `GET /nope` returns 404 in the JSON shape.
-   - Every row in the domain contract table has a test. Delete the `?` check, and `62?90 → 422` fails.
+   - Every row in the domain contract table has a test, except the 2 blur rows (see *Deviations*). Delete the `?` check, and `62?90 → 422` fails.
 
 2. **`feat/input-checks`.** Base64 JSON with data-URL prefix. Missing image. Bad body. Type by first bytes. Size limits.
    Stories S2, S7, S8, S9, S11.
@@ -195,6 +195,7 @@ The top part already exists. PR 4 makes every command in it true, and adds `npm 
    **Accept when:**
    - `npm run harness` on the 4 samples: 0 wrong `high`. img-C unit `unknown`. img-B `low`.
    - The blur cut-off is set from scores measured with `blur.ts`. img-B is below it, all sharp samples are above it.
+   - The 2 blur rows of the domain contract table have a test.
    - Remove the blur check, and "blurred, sure AI model → `low`" fails.
    - A fake provider that hangs → 503. The test runs with a 50 ms timeout.
    - The log line for img-A has the fields in D16 and does not contain `62690.5`.
@@ -233,4 +234,6 @@ See *Future considerations* in `domain.md`.
 
 ## Deviations
 
-None yet.
+| Date | PR | Change | Why |
+| --- | --- | --- | --- |
+| 2026-10-14 | 1 → 3 | The 2 blur rows of the domain contract table move from PR 1 to PR 3. In PR 1 the reading rules take no blur input. | Blur is measured from PR 3 on. A blur input in PR 1 would carry a value nobody measured. |
