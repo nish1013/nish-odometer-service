@@ -41,11 +41,19 @@ export class OpenAiProvider implements OcrProvider {
         { signal },
       )
       .catch((error: unknown) => {
-        throw new OcrUnavailableError("request failed", { cause: error });
+        throw new OcrUnavailableError(`request failed, ${describe(error)}`);
       });
 
     if (!response.output_parsed)
       throw new OcrUnavailableError("no answer, or a refusal");
     return response.output_parsed;
   }
+}
+
+// OpenAI's error messages can echo part of the API key, so only the status, code and type are kept.
+function describe(error: unknown): string {
+  if (error instanceof OpenAI.APIError) {
+    return [error.status, error.code, error.type].filter(Boolean).join(" ");
+  }
+  return error instanceof Error ? error.name : "unknown error";
 }
