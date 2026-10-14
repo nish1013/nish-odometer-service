@@ -1,4 +1,8 @@
-import type { FastifyInstance, LightMyRequestResponse } from "fastify";
+import type {
+  FastifyInstance,
+  FastifyServerOptions,
+  LightMyRequestResponse,
+} from "fastify";
 import { buildApp } from "../../src/app.js";
 import { loadConfig } from "../../src/config/config.js";
 import { MockProvider } from "../../src/ocr/mock-provider.js";
@@ -10,8 +14,9 @@ const URL = "/odometer/reading";
 export function testApp(
   provider: OcrProvider = new MockProvider(),
   env: NodeJS.ProcessEnv = {},
+  options: FastifyServerOptions = {},
 ): Promise<FastifyInstance> {
-  return buildApp(loadConfig({ PORT: "0", ...env }), provider);
+  return buildApp(loadConfig({ PORT: "0", ...env }), provider, options);
 }
 
 export function postFile(

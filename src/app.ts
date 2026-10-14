@@ -13,12 +13,23 @@ export async function buildApp(
   provider: OcrProvider,
   options: FastifyServerOptions = {},
 ): Promise<FastifyInstance> {
-  const app = Fastify({ ...options, bodyLimit: config.maxBodyBytes });
+  const app = Fastify({
+    ...options,
+    bodyLimit: config.maxBodyBytes,
+  });
   await app.register(multipart, {
     limits: { fileSize: config.maxImageBytes },
   });
   app.setErrorHandler(createErrorHandler(config.maxImageBytes));
   app.setNotFoundHandler(handleNotFound);
-  registerReadingRoute(app, provider, config);
+  registerReadingRoute(
+    app,
+    {
+      provider,
+      timeoutMs: config.ocrTimeoutMs,
+      limits: { maxReading: config.maxReading, blurCutoff: config.blurCutoff },
+    },
+    config.maxImageBytes,
+  );
   return app;
 }

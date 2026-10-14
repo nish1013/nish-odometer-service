@@ -1,5 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { UnsupportedTypeError } from "../image/unsupported-type-error.js";
+import { OcrUnavailableError } from "../ocr/ocr-unavailable-error.js";
 import { UnreadableImageError } from "../reading/unreadable-image-error.js";
 import { ApiError } from "./api-error.js";
 import { imageTooLarge } from "./image-input.js";
@@ -18,7 +19,9 @@ const TOO_LARGE_CODES = new Set([
 export function createErrorHandler(maxImageBytes: number): ErrorHandler {
   return (error, request, reply) => {
     const apiError = toApiError(error, maxImageBytes);
-    if (apiError.status >= 500)
+    if (apiError.status === 503)
+      request.log.warn({ err: error }, "OCR unavailable");
+    else if (apiError.status >= 500)
       request.log.error({ err: error }, "request failed");
     return reply.status(apiError.status).send(apiError.toBody());
   };
@@ -40,6 +43,9 @@ function toApiError(error: unknown, maxImageBytes: number): ApiError {
   if (error instanceof ApiError) return error;
   if (error instanceof UnsupportedTypeError) {
     return new ApiError(415, "UNSUPPORTED_TYPE", error.message);
+  }
+  if (error instanceof OcrUnavailableError) {
+    return new ApiError(503, "OCR_UNAVAILABLE", error.message);
   }
   if (error instanceof UnreadableImageError) {
     return new ApiError(422, "UNREADABLE_IMAGE", error.message);

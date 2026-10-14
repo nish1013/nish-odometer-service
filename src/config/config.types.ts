@@ -5,6 +5,8 @@ export interface AppConfig {
   maxReading: number;
   maxImageBytes: number;
   maxBodyBytes: number;
+  ocrTimeoutMs: number;
+  blurCutoff: number;
 }
 
 export type OcrProviderName = "mock" | "openai";

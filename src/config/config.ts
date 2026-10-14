@@ -20,6 +20,8 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
     maxReading: parsePositive("MAX_READING", env.MAX_READING, 999999.9),
     maxImageBytes: toBytes(parsePositive("MAX_IMAGE_MB", env.MAX_IMAGE_MB, 10)),
     maxBodyBytes: toBytes(parsePositive("MAX_BODY_MB", env.MAX_BODY_MB, 14)),
+    ocrTimeoutMs: parsePositive("OCR_TIMEOUT_MS", env.OCR_TIMEOUT_MS, 10000),
+    blurCutoff: parsePositive("BLUR_CUTOFF", env.BLUR_CUTOFF, 40),
   };
 }
 

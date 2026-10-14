@@ -11,6 +11,7 @@ const READING_FORMAT = /^\d+(\.\d)?$/;
 
 export function decide(
   answer: OcrAnswer,
+  blurScore: number,
   limits: ReadingLimits,
 ): Reading | null {
   if (!answer.odometerFound || answer.tripMeterOnly) return null;
@@ -22,7 +23,11 @@ export function decide(
   return {
     reading,
     unit: toUnit(answer.unitShown),
-    confidence: toConfidence(reading, answer.otherPossibleReadings),
+    confidence: toConfidence(
+      reading,
+      answer.otherPossibleReadings,
+      blurScore < limits.blurCutoff,
+    ),
   };
 }
 
@@ -36,7 +41,12 @@ function toUnit(shown: UnitShown): Unit {
   return shown === "none" ? "unknown" : shown;
 }
 
-function toConfidence(reading: number, others: string[]): Confidence {
+function toConfidence(
+  reading: number,
+  others: string[],
+  blurred: boolean,
+): Confidence {
+  if (blurred) return "low";
   const doubt = others.some((other) => parseReading(other) !== reading);
   return doubt ? "low" : "high";
 }
