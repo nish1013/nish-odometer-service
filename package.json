@@ -15,7 +15,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "harness": "tsx harness/run.ts"
+    "harness": "tsx harness/run.ts",
+    "e2e": "scripts/e2e.sh"
   },
   "dependencies": {
     "@fastify/multipart": "^10.1.3",

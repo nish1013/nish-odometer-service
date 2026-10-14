@@ -239,3 +239,4 @@ See *Future considerations* in `domain.md`.
 | --- | --- | --- | --- |
 | 2026-10-14 | 1 → 3 | The 2 blur rows of the domain contract table move from PR 1 to PR 3. In PR 1 the reading rules take no blur input. | Blur is measured from PR 3 on. A blur input in PR 1 would carry a value nobody measured. |
 | 2026-10-14 | 3 | A JPEG or PNG that cannot be decoded returns 422 `UNREADABLE_IMAGE`. Added to D6, S6 and the domain contract. | No decision covered it. The blur check decodes every photo from PR 3 on. The caller should retake the photo (C4). |
+| 2026-10-14 | 4 | Added `scripts/e2e.sh`: every story case over HTTP against the running service, started with Docker Compose when nothing is up. CI runs it as the Docker check. | Asked for by the owner, so anyone can check the whole service with one command and no Node install. |
