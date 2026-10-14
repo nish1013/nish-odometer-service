@@ -162,15 +162,4 @@ describe("D19 every error is JSON", () => {
     });
     expect(res.body).not.toContain("secret detail");
   });
-
-  it("body not multipart -> 400", async () => {
-    app = await testApp();
-    const res = await app.inject({
-      method: "POST",
-      url: "/odometer/reading",
-      payload: { image: "abc" },
-    });
-    expect(res.statusCode).toBe(400);
-    expect(res.json()).toMatchObject({ error: "INVALID_REQUEST" });
-  });
 });

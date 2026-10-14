@@ -8,6 +8,8 @@ describe("loadConfig", () => {
       ocrProvider: "mock",
       openaiApiKey: undefined,
       maxReading: 999999.9,
+      maxImageBytes: 10 * 1024 * 1024,
+      maxBodyBytes: 14 * 1024 * 1024,
     });
   });
 
@@ -47,6 +49,16 @@ describe("loadConfig", () => {
       expect(() => loadConfig({ MAX_READING: value })).toThrow(/MAX_READING/);
     },
   );
+
+  it.each(["MAX_IMAGE_MB", "MAX_BODY_MB"])('%s "0" -> names it', (name) => {
+    expect(() => loadConfig({ [name]: "0" })).toThrow(name);
+  });
+
+  it("S11 MAX_IMAGE_MB=5 -> 5 MB in bytes", () => {
+    expect(loadConfig({ MAX_IMAGE_MB: "5" }).maxImageBytes).toBe(
+      5 * 1024 * 1024,
+    );
+  });
 
   it("reads PORT and MAX_READING", () => {
     const config = loadConfig({ PORT: "8080", MAX_READING: "500000" });

@@ -1,6 +1,7 @@
 import { ConfigError } from "./config-error.js";
 import type { AppConfig, OcrProviderName } from "./config.types.js";
 
+const MEGABYTE = 1024 * 1024;
 const PROVIDERS: readonly OcrProviderName[] = ["mock", "openai"];
 
 export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
@@ -16,7 +17,9 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
     port: parsePort(env.PORT),
     ocrProvider,
     openaiApiKey,
-    maxReading: parseMaxReading(env.MAX_READING),
+    maxReading: parsePositive("MAX_READING", env.MAX_READING, 999999.9),
+    maxImageBytes: toBytes(parsePositive("MAX_IMAGE_MB", env.MAX_IMAGE_MB, 10)),
+    maxBodyBytes: toBytes(parsePositive("MAX_BODY_MB", env.MAX_BODY_MB, 14)),
   };
 }
 
@@ -42,13 +45,19 @@ function parsePort(value: string | undefined): number {
   return port;
 }
 
-function parseMaxReading(value: string | undefined): number {
-  if (value === undefined) return 999999.9;
-  const max = Number(value);
-  if (value.trim() === "" || !Number.isFinite(max) || max <= 0) {
-    throw new ConfigError(
-      `MAX_READING must be a positive number, got "${value}"`,
-    );
+function parsePositive(
+  name: string,
+  value: string | undefined,
+  fallback: number,
+): number {
+  if (value === undefined) return fallback;
+  const number = Number(value);
+  if (value.trim() === "" || !Number.isFinite(number) || number <= 0) {
+    throw new ConfigError(`${name} must be a positive number, got "${value}"`);
   }
-  return max;
+  return number;
+}
+
+function toBytes(megabytes: number): number {
+  return Math.floor(megabytes * MEGABYTE);
 }

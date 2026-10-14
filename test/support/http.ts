@@ -1,22 +1,17 @@
 import type { FastifyInstance, LightMyRequestResponse } from "fastify";
 import { buildApp } from "../../src/app.js";
-import type { AppConfig } from "../../src/config/config.types.js";
+import { loadConfig } from "../../src/config/config.js";
 import { MockProvider } from "../../src/ocr/mock-provider.js";
 import type { OcrProvider } from "../../src/ocr/ocr-provider.js";
 
-const CONFIG: AppConfig = {
-  port: 0,
-  ocrProvider: "mock",
-  openaiApiKey: undefined,
-  maxReading: 999999.9,
-};
-
 const BOUNDARY = "----odometer-test";
+const URL = "/odometer/reading";
 
 export function testApp(
   provider: OcrProvider = new MockProvider(),
+  env: NodeJS.ProcessEnv = {},
 ): Promise<FastifyInstance> {
-  return buildApp(CONFIG, provider);
+  return buildApp(loadConfig({ PORT: "0", ...env }), provider);
 }
 
 export function postFile(
@@ -30,10 +25,29 @@ export function postFile(
       `Content-Type: image/jpeg\r\n\r\n`,
   );
   const tail = Buffer.from(`\r\n--${BOUNDARY}--\r\n`);
+  return postRaw(
+    app,
+    `multipart/form-data; boundary=${BOUNDARY}`,
+    Buffer.concat([head, file, tail]),
+  );
+}
+
+export function postJson(
+  app: FastifyInstance,
+  body: unknown,
+): Promise<LightMyRequestResponse> {
+  return postRaw(app, "application/json", JSON.stringify(body));
+}
+
+export function postRaw(
+  app: FastifyInstance,
+  contentType: string,
+  payload: string | Buffer,
+): Promise<LightMyRequestResponse> {
   return app.inject({
     method: "POST",
-    url: "/odometer/reading",
-    headers: { "content-type": `multipart/form-data; boundary=${BOUNDARY}` },
-    payload: Buffer.concat([head, file, tail]),
+    url: URL,
+    headers: { "content-type": contentType },
+    payload,
   });
 }
