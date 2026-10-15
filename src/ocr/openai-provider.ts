@@ -2,8 +2,8 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import type { OcrAnswer } from "../reading/reading.types.js";
 import { OCR_ANSWER_SCHEMA } from "./ocr-answer.schema.js";
-import type { OcrProvider, OcrRequest } from "./ocr-provider.js";
-import { OcrUnavailableError } from "./ocr-unavailable-error.js";
+import type { OcrProvider, OcrRequest } from "../reading/ocr-provider.js";
+import { OcrUnavailableError } from "../reading/ocr-unavailable-error.js";
 import { OPENAI_PROMPT } from "./openai-prompt.js";
 
 const MODEL = "gpt-4.1-mini";

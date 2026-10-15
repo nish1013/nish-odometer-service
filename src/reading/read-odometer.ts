@@ -2,7 +2,7 @@ import { measureBlur } from "../image/blur.js";
 import type { ImageType } from "../image/image.types.js";
 import { detectImageType } from "../image/image-type.js";
 import { UnsupportedTypeError } from "../image/unsupported-type-error.js";
-import { OcrUnavailableError } from "../ocr/ocr-unavailable-error.js";
+import { OcrUnavailableError } from "./ocr-unavailable-error.js";
 import { decide, hasNothingToRead } from "./reading-rules.js";
 import type {
   OcrAnswer,

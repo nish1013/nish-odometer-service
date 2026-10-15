@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
-import { OcrUnavailableError } from "../../src/ocr/ocr-unavailable-error.js";
+import { OcrUnavailableError } from "../../src/reading/ocr-unavailable-error.js";
 import type { OcrAnswer } from "../../src/reading/reading.types.js";
 import { sureAnswer } from "../support/answers.js";
 import { FakeProvider } from "../support/fake-provider.js";

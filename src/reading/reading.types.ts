@@ -1,5 +1,5 @@
 import type { ImageType } from "../image/image.types.js";
-import type { OcrProvider } from "../ocr/ocr-provider.js";
+import type { OcrProvider } from "./ocr-provider.js";
 
 export interface OcrAnswer {
   odometerFound: boolean;

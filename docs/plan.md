@@ -112,12 +112,12 @@ src/
     reading.types.ts           OcrAnswer, Reading, Unit, Confidence
     reading-rules.ts           decide(answer, blur, limits) -> reading or unreadable. Pure, no I/O
     read-odometer.ts           type -> blur -> provider, 10 s timeout -> rules (D13)
+    ocr-provider.ts            port: interface OcrProvider { read(image): Promise<OcrAnswer> }
+    ocr-unavailable-error.ts
   ocr/
-    ocr-provider.ts            interface OcrProvider { read(image): Promise<OcrAnswer> }
     openai-provider.ts         OpenAI call and answer schema (D12)
     mock-provider.ts           SHA-256 -> fixed answer (D14)
     mock-fixtures.ts           the 4 sample answers
-    ocr-unavailable-error.ts
 harness/
   run.ts                       real provider over labelled photos, prints the report (D15)
   labels.json
@@ -129,6 +129,7 @@ Dockerfile, compose.yaml
 http        reading.route, image-input, error-handler    status codes, request shapes
 service     read-odometer                                one request, in order
 domain      reading-rules, image-type                    pure rules, no I/O
+port        reading/ocr-provider                         owned by the core, adapters implement it
 adapters    ocr/*, blur                                  the outside world
 ```
 
