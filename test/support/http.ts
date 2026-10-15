@@ -6,7 +6,7 @@ import type {
 import { buildApp } from "../../src/app.js";
 import { loadConfig } from "../../src/config/config.js";
 import { MockProvider } from "../../src/ocr/mock-provider.js";
-import type { OcrProvider } from "../../src/ocr/ocr-provider.js";
+import type { OcrProvider } from "../../src/reading/ocr-provider.js";
 
 const BOUNDARY = "----odometer-test";
 const URL = "/odometer/reading";

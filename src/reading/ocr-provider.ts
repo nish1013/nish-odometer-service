@@ -1,5 +1,5 @@
 import type { ImageType } from "../image/image.types.js";
-import type { OcrAnswer } from "../reading/reading.types.js";
+import type { OcrAnswer } from "./reading.types.js";
 
 export interface OcrProvider {
   readonly name: string;

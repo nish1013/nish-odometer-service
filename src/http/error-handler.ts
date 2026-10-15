@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { UnsupportedTypeError } from "../image/unsupported-type-error.js";
-import { OcrUnavailableError } from "../ocr/ocr-unavailable-error.js";
+import { OcrUnavailableError } from "../reading/ocr-unavailable-error.js";
 import { UnreadableImageError } from "../reading/unreadable-image-error.js";
 import { ApiError } from "./api-error.js";
 import { imageTooLarge } from "./image-input.js";

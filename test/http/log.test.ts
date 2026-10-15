@@ -2,7 +2,7 @@ import { Writable } from "node:stream";
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MockProvider } from "../../src/ocr/mock-provider.js";
-import type { OcrProvider } from "../../src/ocr/ocr-provider.js";
+import type { OcrProvider } from "../../src/reading/ocr-provider.js";
 import { OpenAiProvider } from "../../src/ocr/openai-provider.js";
 import { postFile, testApp } from "../support/http.js";
 import { GIF } from "../support/files.js";

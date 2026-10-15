@@ -1,4 +1,7 @@
-import type { OcrProvider, OcrRequest } from "../../src/ocr/ocr-provider.js";
+import type {
+  OcrProvider,
+  OcrRequest,
+} from "../../src/reading/ocr-provider.js";
 import type { OcrAnswer } from "../../src/reading/reading.types.js";
 
 export class FakeProvider implements OcrProvider {
