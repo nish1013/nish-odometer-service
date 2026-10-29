@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { OcrUnavailableError } from "../../src/ocr/ocr-unavailable-error.js";
+import { OcrUnavailableError } from "../../src/reading/ocr-unavailable-error.js";
 import { OpenAiProvider } from "../../src/ocr/openai-provider.js";
 import { sureAnswer } from "../support/answers.js";
 import { IMG_A } from "../support/samples.js";

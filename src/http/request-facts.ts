@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import type { OcrProvider } from "../ocr/ocr-provider.js";
+import type { OcrProvider } from "../reading/ocr-provider.js";
 import type { ErrorCode, RequestFacts } from "./http.types.js";
 
 const FACTS = new WeakMap<FastifyRequest, RequestFacts>();
